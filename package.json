@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/glazey132/buddha-docs-backend#readme",
   "dependencies": {
+    "bluebird": "^3.5.1",
     "connect-mongo": "^2.0.1",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.3",

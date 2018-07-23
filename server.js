@@ -7,3 +7,6 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const User = require('./models').User;
 const routes = require('./routes');
+
+mongoose.Promise = require('bluebird');
+mongoose.connect(process.env.MONGODB_URI);
