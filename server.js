@@ -52,3 +52,12 @@ passport.deserializeUser(function (id, done) {
     done(err, user);
   });
 });
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    User.findOrCreate(username, password, function(err, user) {
+      if(err) { return done(err, null) }
+      return done(null, user); // user registered
+    });
+  }
+));
