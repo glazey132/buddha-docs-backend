@@ -6,10 +6,13 @@ LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const User = require('./models').User;
-const routes = require('./routes');
+// const routes = require('./routes');
 
 mongoose.Promise = require('bluebird');
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(
+  process.env.MONGODB_URI,
+  { useNewUrlParser: true }
+);
 
 /**
  ** Express server w/ Middleware: cookie parser, body parser, express session
@@ -35,29 +38,42 @@ app.use(passport.session());
 ** CORS settings
 */
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Credentials", true
+  res.header('Access-Control-Allow-Credentials', true);
   // res.heder("Access-Control-Allow-Origin", )
-  res.header("Access-Control-Allow-Methods", "OPTIONS, POST, GET");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-type, Accept");
+  res.header('Access-Control-Allow-Methods', 'OPTIONS, POST, GET');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-type, Accept'
+  );
   next();
 });
 
 // passport
-passport.serializeUser(function (user, done) {
+passport.serializeUser(function(user, done) {
   done(null, user.id);
-})
+});
 
-passport.deserializeUser(function (id, done) {
+passport.deserializeUser(function(id, done) {
   User.findById(id, function(err, user) {
     done(err, user);
   });
 });
 
-passport.use(new LocalStrategy(
-  function(username, password, done) {
+passport.use(
+  new LocalStrategy(function(username, password, done) {
     User.findOrCreate(username, password, function(err, user) {
-      if(err) { return done(err, null) }
+      if (err) {
+        return done(err, null);
+      }
       return done(null, user); // user registered
     });
-  }
-));
+  })
+);
+
+app.get('/', function(req, res) {
+  res.send('Hello world');
+});
+
+const server = app.listen(process.env.port || 3000, function() {
+  console.log('\n Backend server for Buddha docs running on port 3000! \n');
+});
