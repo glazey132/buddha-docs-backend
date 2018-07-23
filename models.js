@@ -45,4 +45,9 @@ const DocSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', UserSchema);
-const Doc = mongoose.model('Document', DocSchema);
+const Document = mongoose.model('Document', DocSchema);
+
+module.exports = {
+  User,
+  Document
+};
