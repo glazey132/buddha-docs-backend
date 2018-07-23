@@ -1,0 +1,29 @@
+{
+  "name": "buddha-docs-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "serve": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glazey132/buddha-docs-backend.git"
+  },
+  "author": "alex alglaze132@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/glazey132/buddha-docs-backend/issues"
+  },
+  "homepage": "https://github.com/glazey132/buddha-docs-backend#readme",
+  "dependencies": {
+    "connect-mongo": "^2.0.1",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "mongoose": "^5.2.4",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "socket.io": "^2.1.1"
+  }
+}
