@@ -30,3 +30,14 @@ app.use(
 // Passport.js
 app.use(passport.initialize());
 app.use(passport.session());
+
+/*
+** CORS settings
+*/
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", true
+  // res.heder("Access-Control-Allow-Origin", )
+  res.header("Access-Control-Allow-Methods", "OPTIONS, POST, GET");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-type, Accept");
+  next();
+});
