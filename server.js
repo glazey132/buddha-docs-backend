@@ -5,3 +5,5 @@ const passport = require('passport');
 LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const User = require('./models').User;
+const routes = require('./routes');
