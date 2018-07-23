@@ -10,3 +10,19 @@ const routes = require('./routes');
 
 mongoose.Promise = require('bluebird');
 mongoose.connect(process.env.MONGODB_URI);
+
+/**
+ ** Express server w/ Middleware: cookie parser, body parser, express session
+ */
+const app = express();
+app.use(require('cookie-parser')());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: 'super saiyan',
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    resave: true,
+    saveUninitialized: true
+  })
+);
