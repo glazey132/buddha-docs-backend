@@ -41,3 +41,9 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-type, Accept");
   next();
 });
+
+passport.serializeUser(function (id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
+});
