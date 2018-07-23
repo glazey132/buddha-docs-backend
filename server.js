@@ -77,3 +77,5 @@ app.get('/', function(req, res) {
 const server = app.listen(process.env.port || 3000, function() {
   console.log('\n Backend server for Buddha docs running on port 3000! \n');
 });
+
+modules.export = server;
