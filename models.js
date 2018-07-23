@@ -43,3 +43,6 @@ const DocSchema = new mongoose.Schema({
     default: [] //updates on doc save
   }
 });
+
+const User = mongoose.model('User', UserSchema);
+const Doc = mongoose.model('Document', DocSchema);
