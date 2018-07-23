@@ -42,7 +42,12 @@ app.use((req, res, next) => {
   next();
 });
 
-passport.serializeUser(function (id, done) {
+// passport
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+})
+
+passport.deserializeUser(function (id, done) {
   User.findById(id, function(err, user) {
     done(err, user);
   });
