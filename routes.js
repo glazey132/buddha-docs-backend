@@ -5,6 +5,10 @@ const { User, Doc } = require('./models');
 module.exports = passport => {
   const router = express.Router();
 
+  router.get('/test', (req, res) => {
+    res.status(200).json({ success: true, msg: 'Test was a success' });
+  });
+
   router.post('/login', passport.authenticate('local'), (req, res) => {
     res.redirect('/documents');
   });
