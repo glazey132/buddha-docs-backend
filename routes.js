@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { User, Doc } = require('./models');
+const { User, Document } = require('./models');
 
 module.exports = passport => {
   const router = express.Router();
@@ -19,6 +19,12 @@ module.exports = passport => {
       res.status(400).json({ message: 'Error. You must login to do that.' });
     }
     next();
+  });
+
+  router.get('/documents', (req, res) => {
+    Document.find({ collaborators: req.user.id })
+      .then(docs => res.status(200).json({ docs, user: req.user }))
+      .catch(err => res.status(401).json({ success: false, user: null }));
   });
 
   router.get('/logout', (req, res) => {
