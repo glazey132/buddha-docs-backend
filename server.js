@@ -76,7 +76,7 @@ app.get('/', function(req, res) {
 
 app.use(routes(passport));
 
-const server = app.listen(process.env.port || 3000, function() {
+const server = app.listen(process.env.PORT || 3000, function() {
   console.log('\n Backend server for Buddha docs running on port 3000! \n');
 });
 
