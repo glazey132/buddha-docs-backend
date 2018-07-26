@@ -39,10 +39,7 @@ app.use(passport.session());
 */
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', true);
-  res.header(
-    'Access-Control-Allow-Origin',
-    'https://buddha-docs-server.herokuapp.com/'
-  );
+  res.header('Access-Control-Allow-Origin', 'https://localhost:8080');
   res.header('Access-Control-Allow-Methods', 'OPTIONS, POST, GET');
   res.header(
     'Access-Control-Allow-Headers',
