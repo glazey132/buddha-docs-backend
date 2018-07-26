@@ -10,15 +10,8 @@ module.exports = passport => {
   });
 
   router.post('/login', passport.authenticate('local'), (req, res) => {
-    res.redirect('/documents');
-  });
-
-  // must be logged in to use the routes below
-  router.use((req, res, next) => {
-    if (!req.user) {
-      res.status(400).json({ message: 'Error. You must login to do that.' });
-    }
-    next();
+    console.log('in post to login here is req ', req);
+    // res.redirect('/documents');
   });
 
   router.get('/documents', (req, res) => {

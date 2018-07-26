@@ -63,8 +63,10 @@ passport.use(
   new LocalStrategy(function(username, password, done) {
     User.findOrCreate(username, password, function(err, user) {
       if (err) {
+        console.log('error trying to make user ', err);
         return done(err, null);
       }
+      console.log('user registered ', user);
       return done(null, user); // user registered
     });
   })
