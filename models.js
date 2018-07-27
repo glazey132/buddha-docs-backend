@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
   username: {
     type: String,
     required: true,
@@ -9,7 +10,19 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
-  }
+  },
+  privateDocs: [
+    {
+      type: Schema.ObjectId,
+      ref: 'Document'
+    }
+  ],
+  sharedDocs: [
+    {
+      type: Schema.ObjectId,
+      ref: 'Document'
+    }
+  ]
 });
 
 UserSchema.statics.findOrCreate = function(username, password, callback) {
@@ -33,7 +46,7 @@ UserSchema.statics.findOrCreate = function(username, password, callback) {
     .catch(err => callback(err, null));
 };
 
-const DocSchema = new mongoose.Schema({
+const DocSchema = new Schema({
   title: {
     type: String,
     default: 'untitled'
@@ -55,10 +68,12 @@ const DocSchema = new mongoose.Schema({
     type: Number,
     default: new Date().getTime() // updates on doc save
   },
-  collaborators: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
+  collaborators: [
+    {
+      type: Schema.ObjectId,
+      ref: 'User'
+    }
+  ],
   revision_history: {
     type: Array,
     default: [] //updates on doc save

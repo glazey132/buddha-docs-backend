@@ -24,15 +24,33 @@ module.exports = passport => {
     }
   });
 
+  router.get('/logout', (req, res) => {
+    req.logout();
+    res.json({ message: 'Logout successful' });
+  });
+
   router.get('/getDocuments/:userid', (req, res) => {
     Document.find({ collaborators: req.params.userid })
       .then(docs => res.status(200).json({ docs, userid: req.params.userid }))
       .catch(err => res.status(401).json({ success: false, user: null }));
   });
 
-  router.get('/logout', (req, res) => {
-    req.logout();
-    res.json({ message: 'Logout successful' });
+  router.post('/newDoc', (req, res) => {
+    console.log('\n NEW NEW DOC req in new Doc \n ', req.body);
+    Document.create({ title: req.body.title, password: req.body.password })
+      .then(doc => {
+        res.json({
+          document: doc,
+          success: true,
+          message: 'successful creation of new document'
+        });
+      })
+      .catch(err => {
+        res.json({
+          error: err,
+          message: 'Caught error when trying to create new doc'
+        });
+      });
   });
 
   return router;
