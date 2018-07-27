@@ -10,13 +10,23 @@ module.exports = passport => {
   });
 
   router.post('/login', passport.authenticate('local'), (req, res) => {
-    console.log('in post to login here is req ', req);
-    // res.redirect('/documents');
+    if (req.user) {
+      req.login(req.user, function(err) {
+        if (err) {
+          res.status(404).json({
+            success: false,
+            msg: 'Login was unsuccessful',
+            error: err
+          });
+        }
+      });
+      res.send(req.user);
+    }
   });
 
-  router.get('/documents', (req, res) => {
-    Document.find({ collaborators: req.user.id })
-      .then(docs => res.status(200).json({ docs, user: req.user }))
+  router.get('/getDocuments/:userid', (req, res) => {
+    Document.find({ collaborators: req.params.userid })
+      .then(docs => res.status(200).json({ docs, userid: req.params.userid }))
       .catch(err => res.status(401).json({ success: false, user: null }));
   });
 

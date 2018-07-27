@@ -66,7 +66,6 @@ passport.use(
         console.log('error trying to make user ', err);
         return done(err, null);
       }
-      console.log('user registered ', user);
       return done(null, user); // user registered
     });
   })
