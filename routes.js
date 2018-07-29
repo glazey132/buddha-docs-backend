@@ -74,37 +74,19 @@ module.exports = passport => {
     Document.find({ collaborators: req.user._id })
       .sort({ last_edit: -1 })
       .then(docs => {
-        res
-          .status(200)
-          .json({
-            username: req.user.username,
-            docs: docs,
-            userid: req.user._id
-          });
+        res.status(200).json({
+          username: req.user.username,
+          docs: docs,
+          userid: req.user._id
+        });
       })
       .catch(err =>
-        res
-          .status(404)
-          .json({
-            username: req.user.username,
-            docs: null,
-            userid: req.user._id
-          })
+        res.status(404).json({
+          username: req.user.username,
+          docs: null,
+          userid: req.user._id
+        })
       );
-  });
-
-  router.get('/logout', (req, res) => {
-    req.logout();
-    res.json({ message: 'Logout successful' });
-  });
-
-  router.get('/docs', (req, res) => {
-    console.log('req user in get documents ', req.user);
-    console.log('req.session in docs route ', req.session);
-    Document.find({ collaborators: req.params.userid })
-      .sort({ last_edit: -1 })
-      .then(docs => res.status(200).json({ docs, user: req.user }))
-      .catch(err => res.status(401).json({ success: false, user: null }));
   });
 
   router.post('/newDoc', (req, res) => {
@@ -123,6 +105,11 @@ module.exports = passport => {
           message: 'Caught error when trying to create new doc'
         });
       });
+  });
+
+  router.get('/logout', (req, res) => {
+    req.logout();
+    res.json({ message: 'Logout successful' });
   });
 
   return router;
