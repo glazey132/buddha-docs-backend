@@ -34,14 +34,13 @@ app.use((req, res, next) => {
 });
 
 /*
-** Middleware: cookie parser, body parser, express session
+** Middleware:body parser, express session
 */
-app.use(require('cookie-parser')());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: 'flashy',
+    secret: process.env.SESSION_SECRET,
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
     resave: true,
     saveUninitialized: true
@@ -74,21 +73,23 @@ passport.use(
 );
 
 passport.serializeUser(function(user, done) {
-  console.log('inside serialize user here is user: ', user);
-  console.log('inside serialize user here is user.id: ', user.id);
-  console.log(
-    'inside serialize user and here is user._id UNDERSCORE ',
-    user._id
-  );
+  console.log('inside serialize user here is user: ', user, user.id);
   done(null, user._id);
 });
 
-passport.deserializeUser(function(id, done) {
+passport.deserializeUser(async function(id, done) {
   console.log('in deserialize here is id ', id);
-  User.findById(id, function(err, user) {
-    console.log('inside user.findbyid here is found user ', user);
-    done(err, user);
-  });
+  User.findById(id)
+    .then(user => {
+      if (user) {
+        console.log('User in deserialize ===> ', user);
+        done(null, user);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      done(err);
+    });
 });
 
 app.use(routes(passport));
