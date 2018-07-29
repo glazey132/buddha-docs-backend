@@ -9,19 +9,63 @@ module.exports = passport => {
     res.status(200).json({ success: true, msg: 'Test was a success' });
   });
 
-  router.post('/login', passport.authenticate('local'), (req, res) => {
-    if (req.user) {
-      req.login(req.user, function(err) {
-        if (err) {
-          res.status(404).json({
-            success: false,
-            msg: 'Login was unsuccessful',
-            error: err
-          });
-        }
+  router.get('/register', (req, res) => {
+    console.log('get register route');
+  });
+
+  router.post('/register', (req, res) => {
+    User.create({
+      username: req.body.username,
+      password: req.body.password
+    })
+      .then(user => {
+        console.log(`User: ${user} created`);
+        res
+          .status(200)
+          .json({ success: true, user: user, msg: `User: ${user} created` });
+      })
+      .catch(err => {
+        console.log(`Caught error: ${err}`);
+        res.status(500).json({ success: false, error: err, msg: 'caught err' });
       });
-      res.send(req.user);
+  });
+
+  router.get('/login', (req, res) => {
+    console.log('get login route');
+  });
+
+  router.post(
+    '/login',
+    passport.authenticate('local', {
+      successRedirect: '/docs',
+      failureRedirect: '/'
+    })
+  );
+
+  router.use(function(req, res, next) {
+    if (!req.user) {
+      res.json({
+        success: false,
+        message:
+          "Not logged in! Req.user has not been provided and needs to be seen to. Set the with credentials flag of all axios calls to secure routes to true. Do that and you've successfully made it into MORDOR!!!🗻 🕷 🗡 🏔  🏹 💍 👿 🌋 "
+      });
+    } else {
+      console.log(req.user.username, 'has passed the gate, press on!😡 🛡 ⚔️');
+      next();
     }
+  });
+
+  router.get('/docs', (req, res) => {
+    console.log('in docs here is req.user ', req.user);
+    console.log('in docs here is req.session ', req.session);
+    Doc.find({ collaborators: req.user.id })
+      .sort({ last_edit: -1 })
+      .then(docs => {
+        res.json({ docs, user: req.user });
+      })
+      .catch(err => {
+        res.json({ err });
+      });
   });
 
   router.get('/logout', (req, res) => {
@@ -29,9 +73,12 @@ module.exports = passport => {
     res.json({ message: 'Logout successful' });
   });
 
-  router.get('/getDocuments/:userid', (req, res) => {
+  router.get('/docs', (req, res) => {
+    console.log('req user in get documents ', req.user);
+    console.log('req.session in docs route ', req.session);
     Document.find({ collaborators: req.params.userid })
-      .then(docs => res.status(200).json({ docs, userid: req.params.userid }))
+      .sort({ last_edit: -1 })
+      .then(docs => res.status(200).json({ docs, user: req.user }))
       .catch(err => res.status(401).json({ success: false, user: null }));
   });
 

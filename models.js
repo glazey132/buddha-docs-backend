@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const UserSchema = new Schema({
+const UserSchema = mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -13,7 +13,7 @@ const UserSchema = new Schema({
   },
   privateDocs: [
     {
-      type: Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Document'
     }
   ],
@@ -46,7 +46,7 @@ UserSchema.statics.findOrCreate = function(username, password, callback) {
     .catch(err => callback(err, null));
 };
 
-const DocSchema = new Schema({
+const DocSchema = mongoose.Schema({
   title: {
     type: String,
     default: 'untitled'
@@ -70,7 +70,7 @@ const DocSchema = new Schema({
   },
   collaborators: [
     {
-      type: Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     }
   ],

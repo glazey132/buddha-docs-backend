@@ -15,24 +15,9 @@ mongoose.connect(
 );
 
 /**
- ** Express server w/ Middleware: cookie parser, body parser, express session
+ ** Express server
  */
 const app = express();
-app.use(require('cookie-parser')());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(
-  session({
-    secret: 'super saiyan',
-    store: new MongoStore({ mongooseConnection: mongoose.connection }),
-    resave: true,
-    saveUninitialized: true
-  })
-);
-
-// Passport.js
-app.use(passport.initialize());
-app.use(passport.session());
 
 /*
 ** CORS settings
@@ -48,31 +33,62 @@ app.use((req, res, next) => {
   next();
 });
 
-// passport
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
-
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function(err, user) {
-    done(err, user);
-  });
-});
-
-passport.use(
-  new LocalStrategy(function(username, password, done) {
-    User.findOrCreate(username, password, function(err, user) {
-      if (err) {
-        console.log('error trying to make user ', err);
-        return done(err, null);
-      }
-      return done(null, user); // user registered
-    });
+/*
+** Middleware: cookie parser, body parser, express session
+*/
+app.use(require('cookie-parser')());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: 'flashy',
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    resave: true,
+    saveUninitialized: true
   })
 );
 
-app.get('/', function(req, res) {
-  res.send('Hello world');
+// Passport.js
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(
+  new LocalStrategy(function(username, password, done) {
+    User.findOne({ username: username })
+      .populate('privateDocs', 'sharedDocs')
+      .exec((err, user) => {
+        if (err) {
+          return done(err);
+        }
+        if (!user) {
+          return done(null, false, {
+            message: `${username} does not exist in our database.`
+          });
+        }
+        if (user.password !== password) {
+          return done(null, false, { message: 'Incorrect password' });
+        }
+        return done(null, user);
+      });
+  })
+);
+
+passport.serializeUser(function(user, done) {
+  console.log('inside serialize user here is user: ', user);
+  console.log('inside serialize user here is user.id: ', user.id);
+  console.log(
+    'inside serialize user and here is user._id UNDERSCORE ',
+    user._id
+  );
+  done(null, user._id);
+});
+
+passport.deserializeUser(function(id, done) {
+  console.log('in deserialize here is id ', id);
+  User.findById(id, function(err, user) {
+    console.log('inside user.findbyid here is found user ', user);
+    done(err, user);
+  });
 });
 
 app.use(routes(passport));
