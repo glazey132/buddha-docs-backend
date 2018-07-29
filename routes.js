@@ -40,7 +40,7 @@ module.exports = passport => {
           if (err) {
             return res.send(err);
           }
-          res.redirect('/docs');
+          res.redirect('/userid');
         });
       }
     })(req, res, next);
@@ -59,18 +59,16 @@ module.exports = passport => {
     }
   });
 
-  router.get('/docs', (req, res) => {
-    console.log('in docs here is req.user ', req.user);
-    console.log('in docs here is req.session ', req.session);
-    res.json({ success: true, msg: 'returned from docs route' });
-    // Document.find({ collaborators: req.user.id })
-    //   .sort({ last_edit: -1 })
-    //   .then(docs => {
-    //     res.json({ docs, user: req.user });
-    //   })
-    //   .catch(err => {
-    //     res.json({ err });
-    //   });
+  router.get('/userid', (req, res) => {
+    res.json({
+      success: true,
+      msg: 'returned from docs route',
+      id: req.user._id
+    });
+  });
+
+  router.get('/getAllDocs/:userid', (req, res) => {
+    console.log('req in getAllDocs ', req.params);
   });
 
   router.get('/logout', (req, res) => {
