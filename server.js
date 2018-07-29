@@ -20,42 +20,36 @@ mongoose.connect(
 const app = express();
 
 /*
-** CORS settings
-*/
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
-  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  next();
-});
-
-/*
 ** Middleware:body parser, express session
 */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   session({
-    name: 'session_id',z
     secret: process.env.SESSION_SECRET,
-    store: new MongoStore({ mongooseConnection: mongoose.connection }),
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
-    }
+    store: new MongoStore({ mongooseConnection: mongoose.connection })
   })
 );
 
-// Passport.js
+// Passport.js initialize
 app.use(passport.initialize());
 app.use(passport.session());
 
+/*
+** CORS settings
+*/
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, X-AUTHENTICATION, X-IP, Content-Type, Accept'
+  );
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  next();
+});
+
+// Passport.js localstrategy and serializeUser / deserializeUser
 passport.use(
   new LocalStrategy(function(username, password, done) {
     User.findOne({ username: username })
@@ -88,15 +82,16 @@ passport.deserializeUser(async function(id, done) {
     .then(user => {
       if (user) {
         console.log('User in deserialize ===> ', user);
-        done(null, user);
+        return done(null, user);
       }
     })
     .catch(err => {
       console.error(err);
-      done(err);
+      return done(err);
     });
 });
 
+//apply passport to all routes
 app.use(routes(passport));
 
 const server = app.listen(process.env.PORT || 3000, function() {

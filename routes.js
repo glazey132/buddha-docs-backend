@@ -34,13 +34,25 @@ module.exports = passport => {
     console.log('get login route');
   });
 
-  router.post(
-    '/login',
-    passport.authenticate('local', {
-      successRedirect: '/docs',
-      failureRedirect: '/'
-    })
-  );
+  router.post('/login', (req, res, next) => {
+    passport.authenticate('local', function(err, user, info) {
+      if (err) {
+        console.log('inside error');
+        return next(err);
+      }
+      if (!user) {
+        console.log('No user');
+        res.status(401).send('not user');
+      } else {
+        req.login(user, function(err) {
+          if (err) {
+            return res.send(err);
+          }
+          res.redirect('/docs');
+        });
+      }
+    })(req, res, next);
+  });
 
   router.use(function(req, res, next) {
     if (!req.user) {
@@ -58,14 +70,15 @@ module.exports = passport => {
   router.get('/docs', (req, res) => {
     console.log('in docs here is req.user ', req.user);
     console.log('in docs here is req.session ', req.session);
-    Doc.find({ collaborators: req.user.id })
-      .sort({ last_edit: -1 })
-      .then(docs => {
-        res.json({ docs, user: req.user });
-      })
-      .catch(err => {
-        res.json({ err });
-      });
+    res.json({ success: true, msg: 'returned from docs route' });
+    // Document.find({ collaborators: req.user.id })
+    //   .sort({ last_edit: -1 })
+    //   .then(docs => {
+    //     res.json({ docs, user: req.user });
+    //   })
+    //   .catch(err => {
+    //     res.json({ err });
+    //   });
   });
 
   router.get('/logout', (req, res) => {
