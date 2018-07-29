@@ -46,6 +46,11 @@ UserSchema.statics.findOrCreate = function(username, password, callback) {
     .catch(err => callback(err, null));
 };
 
+//user: {
+//   type: Schema.ObjectId,
+//   ref: 'User',
+// },
+
 const DocSchema = mongoose.Schema({
   title: {
     type: String,

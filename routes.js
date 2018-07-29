@@ -68,7 +68,29 @@ module.exports = passport => {
   });
 
   router.get('/getAllDocs/:userid', (req, res) => {
-    console.log('req in getAllDocs ', req.params);
+    console.log('in get all docs req.user ===> ', req.user);
+    let privateDocs = [];
+    let sharedDocs = [];
+    Document.find({ collaborators: req.user._id })
+      .sort({ last_edit: -1 })
+      .then(docs => {
+        res
+          .status(200)
+          .json({
+            username: req.user.username,
+            docs: docs,
+            userid: req.user._id
+          });
+      })
+      .catch(err =>
+        res
+          .status(404)
+          .json({
+            username: req.user.username,
+            docs: null,
+            userid: req.user._id
+          })
+      );
   });
 
   router.get('/logout', (req, res) => {
