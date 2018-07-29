@@ -9,10 +9,6 @@ module.exports = passport => {
     res.status(200).json({ success: true, msg: 'Test was a success' });
   });
 
-  router.get('/register', (req, res) => {
-    console.log('get register route');
-  });
-
   router.post('/register', (req, res) => {
     User.create({
       username: req.body.username,
@@ -28,10 +24,6 @@ module.exports = passport => {
         console.log(`Caught error: ${err}`);
         res.status(500).json({ success: false, error: err, msg: 'caught err' });
       });
-  });
-
-  router.get('/login', (req, res) => {
-    console.log('get login route');
   });
 
   router.post('/login', (req, res, next) => {
