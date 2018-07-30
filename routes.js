@@ -91,7 +91,15 @@ module.exports = passport => {
 
   router.post('/newDoc', (req, res) => {
     console.log('\n NEW NEW DOC req in new Doc \n ', req.body);
-    Document.create({ title: req.body.title, password: req.body.password })
+    Document.create({
+      title: req.body.title,
+      password: req.body.password,
+      collaborators: [req.user.id],
+      contents: req.body.contents,
+      revision_history: [
+        { timestamp: new Date().getTime(), contents: req.body.contents }
+      ]
+    })
       .then(doc => {
         res.json({
           document: doc,
