@@ -98,4 +98,12 @@ const server = app.listen(process.env.PORT || 3000, function() {
   console.log('\n Backend server for Buddha docs running on port 3000! \n');
 });
 
+const io = require('socket.io').listen(server);
+
+io.on('connection', onConnect);
+
+function onConnect(socket) {
+  console.log('connection to socket made');
+}
+
 module.export = server;

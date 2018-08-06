@@ -115,6 +115,33 @@ module.exports = passport => {
       });
   });
 
+  router.get('/findDoc/:docId', (req, res) => {
+    console.log('in findDoc by id route here is req ---> ', req.user._id);
+    Document.findById(req.params.docId, function(err, doc) {
+      if (err || !doc) {
+        console.log('Unable to find document associated with given id');
+        res.status(500).json({
+          success: false,
+          doc: null,
+          msg: 'Error locating document with given id'
+        });
+      } else if (doc.collaborators.indexOf(req.user._id) === -1) {
+        console.log('doc . collabers ', doc);
+        res.status(401).json({
+          success: false,
+          doc: null,
+          msg:
+            'You do not have access to view this document because you are not on the list of collaborators!'
+        });
+      } else {
+        console.log('doc . collabers ', doc);
+        res
+          .status(200)
+          .json({ success: true, doc: doc, msg: 'Welcome to the document!' });
+      }
+    });
+  });
+
   router.get('/logout', (req, res) => {
     req.logout();
     res.json({ message: 'Logout successful' });
