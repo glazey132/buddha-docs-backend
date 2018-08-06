@@ -25,32 +25,6 @@ const UserSchema = mongoose.Schema({
   ]
 });
 
-UserSchema.statics.findOrCreate = function(username, password, callback) {
-  User.findOne({ username })
-    .then(user => {
-      if (!user) {
-        User.create({
-          username,
-          password
-        })
-          .then(resp => callback(null, resp)) // register
-          .catch(err => callback(err, null)); // error
-      } else if (password !== user.password) {
-        // invalid password entered by user
-        callback('Passwords do not match', null);
-      } else {
-        //authentication successful. pass user to client
-        callback(null, user);
-      }
-    })
-    .catch(err => callback(err, null));
-};
-
-//user: {
-//   type: Schema.ObjectId,
-//   ref: 'User',
-// },
-
 const DocSchema = mongoose.Schema({
   title: {
     type: String,
