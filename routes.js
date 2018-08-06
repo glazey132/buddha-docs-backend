@@ -142,6 +142,35 @@ module.exports = passport => {
     });
   });
 
+  router.post('/saveDoc', (req, res) => {
+    console.log('req.body in save doc ', req.body);
+    if (!req.body.contents) {
+      res
+        .status(400)
+        .json({ sucess: false, msg: 'no contents provided to save.' });
+    }
+
+    Document.findByIdAndUpdate(
+      { _id: req.body.docid },
+      {
+        contents: req.body.contents,
+        title: req.body.title,
+        last_edit: new Date().getTime()
+      }
+    )
+      .then(result => {
+        console.log('result of saving doc ', result);
+        res.json({ success: true, msg: 'successfully saved doc!' });
+      })
+      .catch(err => {
+        res.json({
+          msg: 'caught error saving doc',
+          success: false,
+          error: err
+        });
+      });
+  });
+
   router.get('/logout', (req, res) => {
     req.logout();
     res.json({ message: 'Logout successful' });
