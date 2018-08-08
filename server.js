@@ -123,6 +123,19 @@ io.on('connection', function(socket) {
       username: data.username
     });
   });
+
+  socket.on('changeName', data => {
+    socket.broadcast.to(data.docId).emit('updateName', {
+      name: data.name
+    });
+  });
+
+  socket.on('cursor', data => {
+    console.log('cursor update ', data);
+    socket.broadcast.to(data.docId).emit('updateCursor', {
+      loc: data.loc
+    });
+  });
 });
 
 module.export = server;
