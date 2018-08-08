@@ -11,15 +11,9 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  privateDocs: [
+  docList: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Document'
-    }
-  ],
-  sharedDocs: [
-    {
-      type: Schema.ObjectId,
       ref: 'Document'
     }
   ]

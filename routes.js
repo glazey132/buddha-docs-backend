@@ -171,6 +171,52 @@ module.exports = passport => {
       });
   });
 
+  router.post('/document/add', (req, res) => {
+    console.log('req.body in document add ', req.body);
+    Document.findById(req.body.docId, function(err, doc) {
+      if (err || !doc) {
+        console.log('Unable to find document associated with given id');
+        res.status(500).json({
+          success: false,
+          doc: null,
+          msg: 'Error locating document with given id'
+        });
+      } else if (doc.collaborators.indexOf(req.user._id) === -1) {
+        let user = req.user;
+        user.docList.push(req.body.docId);
+        doc.collaborators.push(user._id);
+        Promise.all([
+          user.save(),
+          doc.save(),
+          User.populate(req.user, { path: 'docsList', select: 'ts name' })
+        ])
+          .then(all => {
+            console.log(`Found new doc ${doc.title} for ${req.user.username}`);
+            res.status(200).json({
+              success: true,
+              user: all[2],
+              document: all[1],
+              message: 'Congrats! You are now a collaborator'
+            });
+            console.log('Promise.all OBJ *$*$* ===> ', all);
+          })
+          .catch(err => {
+            res.status(400).json({ success: false, error: err });
+          });
+      } else {
+        console.log(
+          `${req.user.username} was already a collaborator on doc: ${doc.title}`
+        );
+        res.json({
+          success: true,
+          document: doc,
+          user: req.user,
+          message: 'Adding a doc you already have.'
+        });
+      }
+    });
+  });
+
   router.get('/logout', (req, res) => {
     req.logout();
     res.json({ message: 'Logout successful' });
