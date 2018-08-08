@@ -100,10 +100,20 @@ const server = app.listen(process.env.PORT || 3000, function() {
 
 const io = require('socket.io').listen(server);
 
-io.on('connection', onConnect);
-
-function onConnect(socket) {
+io.on('connection', function(socket) {
   console.log('connection to socket made');
-}
+
+  socket.on('documentJoin', data => {
+    socket.join(data.docId);
+  });
+
+  socket.on('documentLeave', data => {
+    console.log('socket received a document leave ', data);
+    socket.broadcast.to(data.docId).emit('userLeave', {
+      color: data.color
+    });
+    socket.leave(data.docId);
+  });
+});
 
 module.export = server;
