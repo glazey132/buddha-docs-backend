@@ -114,6 +114,15 @@ io.on('connection', function(socket) {
     });
     socket.leave(data.docId);
   });
+
+  socket.on('changeEditorState', data => {
+    socket.broadcast.to(data.docId).emit('updateEditorState', {
+      contentState: data.contentState,
+      selectionState: data.selectionState,
+      color: data.color,
+      username: data.username
+    });
+  });
 });
 
 module.export = server;
