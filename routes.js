@@ -116,7 +116,6 @@ module.exports = passport => {
   });
 
   router.get('/findDoc/:docId', (req, res) => {
-    console.log('in findDoc by id route here is req ---> ', req.user._id);
     Document.findById(req.params.docId, function(err, doc) {
       if (err || !doc) {
         console.log('Unable to find document associated with given id');
@@ -126,7 +125,6 @@ module.exports = passport => {
           msg: 'Error locating document with given id'
         });
       } else if (doc.collaborators.indexOf(req.user._id) === -1) {
-        console.log('doc . collabers ', doc);
         res.status(401).json({
           success: false,
           doc: null,
@@ -134,7 +132,6 @@ module.exports = passport => {
             'You do not have access to view this document because you are not on the list of collaborators!'
         });
       } else {
-        console.log('doc . collabers ', doc);
         res
           .status(200)
           .json({ success: true, doc: doc, msg: 'Welcome to the document!' });
@@ -172,7 +169,6 @@ module.exports = passport => {
   });
 
   router.post('/document/add', (req, res) => {
-    console.log('req.body in document add ', req.body);
     Document.findById(req.body.docId, function(err, doc) {
       if (err || !doc) {
         console.log('Unable to find document associated with given id');

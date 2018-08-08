@@ -72,16 +72,16 @@ passport.use(
 );
 
 passport.serializeUser(function(user, done) {
-  console.log('inside serialize user here is user: ', user, user.id);
+  //console.log('inside serialize user here is user: ', user, user.id);
   done(null, user._id);
 });
 
 passport.deserializeUser(async function(id, done) {
-  console.log('in deserialize here is id ', id);
+  //console.log('in deserialize here is id ', id);
   User.findById(id)
     .then(user => {
       if (user) {
-        console.log('User in deserialize ===> ', user);
+        //console.log('User in deserialize ===> ', user);
         return done(null, user);
       }
     })
@@ -104,11 +104,18 @@ io.on('connection', function(socket) {
   console.log('connection to socket made');
 
   socket.on('documentJoin', data => {
+    console.log(
+      'client socket sent document join to the server socket. Data => ',
+      data
+    );
     socket.join(data.docId);
   });
 
   socket.on('documentLeave', data => {
-    console.log('socket received a document leave ', data);
+    console.log(
+      'server socket received a document leave from client socket. data => ',
+      data
+    );
     socket.broadcast.to(data.docId).emit('userLeave', {
       color: data.color
     });
@@ -116,6 +123,10 @@ io.on('connection', function(socket) {
   });
 
   socket.on('changeEditorState', data => {
+    console.log(
+      'server socket received a change editor state from client socket. data => ',
+      data
+    );
     socket.broadcast.to(data.docId).emit('updateEditorState', {
       contentState: data.contentState,
       selectionState: data.selectionState,
@@ -125,6 +136,10 @@ io.on('connection', function(socket) {
   });
 
   socket.on('changeName', data => {
+    console.log(
+      'server socket received a change name from client socket. data => ',
+      data
+    );
     socket.broadcast.to(data.docId).emit('updateName', {
       name: data.name
     });
