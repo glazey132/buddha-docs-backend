@@ -146,24 +146,25 @@ module.exports = passport => {
         .status(400)
         .json({ sucess: false, msg: 'no contents provided to save.' });
     }
-
-    Document.findByIdAndUpdate(
-      { _id: req.body.docid },
-      {
-        contents: req.body.contents,
-        last_edit: new Date().getTime()
-      }
-    )
-      .then(result => {
-        console.log('result of saving doc ', result);
-        res.json({ success: true, msg: 'successfully saved doc!' });
+    Document.findById(req.body.docid)
+      .then(doc => {
+        (doc.contents = req.body.contents),
+          (doc.last_edit = new Date().getTime()),
+          (doc.revision_history = [
+            ...doc.revision_history,
+            { timestamp: doc.last_edit, contents: req.body.contents }
+          ]);
+        doc
+          .save()
+          .then(doc => {
+            res.status(200).json({ doc });
+          })
+          .catch(err => {
+            res.json({ err });
+          });
       })
       .catch(err => {
-        res.json({
-          msg: 'caught error saving doc',
-          success: false,
-          error: err
-        });
+        res.json({ err });
       });
   });
 
