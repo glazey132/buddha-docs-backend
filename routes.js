@@ -151,7 +151,6 @@ module.exports = passport => {
       { _id: req.body.docid },
       {
         contents: req.body.contents,
-        title: req.body.title,
         last_edit: new Date().getTime()
       }
     )
