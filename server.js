@@ -100,57 +100,40 @@ const server = app.listen(process.env.PORT || 3000, function() {
 
 const io = require('socket.io').listen(server);
 
-io.on('connection', function(socket) {
-  console.log('connection to socket made');
+io.on('connect', onConnection);
 
-  socket.on('documentJoin', data => {
-    console.log(
-      'client socket sent document join to the server socket. Data => ',
-      data
-    );
-    socket.join(data.docId);
+function onConnection(socket) {
+  const rooms = io.sockets.adapter.rooms;
+  const colors = ['red', 'lime', 'dodgerblue', 'magenta', 'cyan', 'purple'];
+  socket.on('connection', room => {
+    socket.join(room);
+    if (rooms[room].currentContentState) {
+      socket.emit('state update', rooms[room].currentContentState);
+    }
   });
 
-  socket.on('documentLeave', data => {
-    console.log(
-      'server socket received a document leave from client socket. data => ',
-      data
-    );
-    socket.broadcast.to(data.docId).emit('userLeave', {
-      color: data.color
-    });
-    socket.leave(data.docId);
+  socket.on('disconnect', () => {
+    console.log('user disconnected!');
   });
 
   socket.on('changeEditorState', data => {
-    console.log(
-      'server socket received a change editor state from client socket. data => ',
-      data
-    );
-    socket.broadcast.to(data.docId).emit('updateEditorState', {
-      contentState: data.contentState,
-      selectionState: data.selectionState,
-      color: data.color,
-      username: data.username
-    });
+    console.log('socket got change editor state action ! data ==> ', data);
+    if (io.sockets.adapter.rooms[data.room]) {
+      let socketIdArr = Object.keys(rooms);
+      const selectedColor = colors[socketIdArr.indexOf(data.socketId)];
+      data.userObj = {};
+      if (data.data) {
+        data.userObj[data.socketId] = {
+          color: selectedColor,
+          top: data.data.loc.top,
+          left: data.data.loc.left,
+          right: data.data.loc.right
+        };
+      }
+      socket.to(data.room).emit('changeEditorState', data);
+      rooms[data.room].currentContentState = data.contentState;
+    }
   });
-
-  socket.on('changeName', data => {
-    console.log(
-      'server socket received a change name from client socket. data => ',
-      data
-    );
-    socket.broadcast.to(data.docId).emit('updateName', {
-      name: data.name
-    });
-  });
-
-  socket.on('cursor', data => {
-    console.log('cursor update ', data);
-    socket.broadcast.to(data.docId).emit('updateCursor', {
-      loc: data.loc
-    });
-  });
-});
+}
 
 module.export = server;
