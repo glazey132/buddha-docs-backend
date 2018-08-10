@@ -122,7 +122,6 @@ function onConnection(socket) {
   });
 
   socket.on('changeEditorState', data => {
-    console.log('socket got change editor state action ! data ==> ', data);
     if (io.sockets.adapter.rooms[data.room]) {
       let socketIdArr = Object.keys(rooms);
       const selectedColor = colors[socketIdArr.indexOf(data.socketId)];
