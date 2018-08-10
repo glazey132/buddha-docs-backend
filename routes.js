@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 
 const { User, Document } = require('./models');
 
@@ -9,21 +10,33 @@ module.exports = passport => {
     res.status(200).json({ success: true, msg: 'Test was a success' });
   });
 
-  router.post('/register', (req, res) => {
-    User.create({
-      username: req.body.username,
-      password: req.body.password
-    })
-      .then(user => {
-        console.log(`User: ${user} created`);
-        res
-          .status(200)
-          .json({ success: true, user: user, msg: `User: ${user} created` });
-      })
-      .catch(err => {
-        console.log(`Caught error: ${err}`);
-        res.status(500).json({ success: false, error: err, msg: 'caught err' });
+  router.post('/register', (req, res, next) => {
+    let hashedPass = bcrypt.genSalt(10, function(err, salt) {
+      if (err) return next(err);
+      bcrypt.hash(req.body.password, salt, function(err, hash) {
+        if (err) return next(err);
+        hashedPass = hash; // set newly hased pass to our hashedPass variable
+        console.log('hashedPassword ', hashedPass);
+        User.create({
+          username: req.body.username,
+          password: hashedPass
+        })
+          .then(user => {
+            console.log(`User: ${user} created`);
+            res.status(200).json({
+              success: true,
+              user: user,
+              msg: `User: ${user} created`
+            });
+          })
+          .catch(err => {
+            console.log(`Caught error: ${err}`);
+            res
+              .status(500)
+              .json({ success: false, error: err, msg: 'caught err' });
+          });
       });
+    });
   });
 
   router.post('/login', (req, res, next) => {

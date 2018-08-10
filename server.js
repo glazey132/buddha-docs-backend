@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const passport = require('passport');
@@ -57,16 +58,20 @@ passport.use(
       .exec((err, user) => {
         if (err) {
           return done(err);
+        } else if (!user) {
+          let err = new Error('User not found.');
+          err.status = 401;
+          return done(err);
         }
-        if (!user) {
-          return done(null, false, {
-            message: `${username} does not exist in our database.`
-          });
-        }
-        if (user.password !== password) {
-          return done(null, false, { message: 'Incorrect password' });
-        }
-        return done(null, user);
+        bcrypt.compare(password, user.password, function(err, result) {
+          if (result === true) {
+            console.log('the user from bcrypt compare ', user);
+            done(null, user);
+          } else {
+            console.log(`The hash did not work for you \n ${err}`);
+            done(null, false);
+          }
+        });
       });
   })
 );
